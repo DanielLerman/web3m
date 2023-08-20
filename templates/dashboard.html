@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <h2>Welcome {{ name }}</h2>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>
+"""
+
+
+# Path: templates/base.html
+"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask Login</title>
+</head>
+<body>
+    {% block content %}{% endblock %}
+</body>
+</html>

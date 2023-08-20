@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Visualization</title>
+    <!-- Include Highcharts script -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+    <h1>Data Visualization</h1>
+    <div id="chart-container"></div>
+    <script>
+        // JavaScript code to initialize Highcharts chart
+        // Use the data passed from Flask to populate the chart
+        // Example code: (replace with your actual chart configuration)
+        Highcharts.chart('chart-container', {
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: 'Average Gas Prices Over Time'
+            },
+            xAxis: {
+                categories: ['Jan', 'Feb', 'Mar'] // Sample data
+            },
+            yAxis: {
+                title: {
+                    text: 'Average Gas Price'
+                }
+            },
+            series: [{
+                name: 'Cryptopunks',
+                data: [5, 10, 15] // Sample data
+            }, {
+                name: 'MutantApe',
+                data: [10, 15, 20] // Sample data
+            }]
+        });
+    </script>
+</body>
+</html>
