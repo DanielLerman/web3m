@@ -7,7 +7,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import requests
 import json
+from elasticsearch import Elasticsearch
+from datetime import datetime
+import logging
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
@@ -133,36 +137,79 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+def get_eth_to_usd_exchange_rate():
+    response = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd")
+    data = response.json()
+    return data.get("ethereum", {}).get("usd")
+
+def process_and_store_data(data, project_name):
+    hourly_gas_fees = {}  # To store average gas fees per hour
+    for entry in data['result']:
+        timestamp = int(entry['timeStamp'])
+        gas_price = int(entry['gasPrice']) / 1e9  # Convert from Gwei to ETH
+        gas_fee = gas_price * int(entry['gasUsed']) / 1e18  # Convert to ETH
+        hour = datetime.utcfromtimestamp(timestamp).hour
+
+        if hour not in hourly_gas_fees:
+            hourly_gas_fees[hour] = []
+
+        hourly_gas_fees[hour].append(gas_fee)
+
+    # Calculate average gas fees for each hour
+    avg_gas_fees = {hour: sum(fees) / len(fees) for hour, fees in hourly_gas_fees.items()}
+
+    # Get current Ether-to-USD exchange rate
+    eth_to_usd_exchange_rate = get_eth_to_usd_exchange_rate()
+
+    # Calculate average gas fees in USD for each hour
+    avg_gas_fees_usd = {hour: avg_fee * eth_to_usd_exchange_rate for hour, avg_fee in avg_gas_fees.items()}
+
+    # Store or log average gas fees in USD
+    for hour, avg_fee_usd in avg_gas_fees_usd.items():
+        timestamp_str = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+        avg_fee_eth = avg_gas_fees[hour]  # Get the average gas fee in ETH for the current hour
+        logging.info("Project: %s, Hour: %s, Timestamp: %s, Average Gas Fee (ETH): %s, Average Gas Fee (USD): %s",
+                     project_name, hour, timestamp_str, avg_fee_eth, avg_fee_usd)
 
 
 @app.route('/fetch_data')
 def fetch_data():
-    # Fetching keys from environment variables
     CRYPTOPUNKS_KEY = os.environ.get("CRYPTOPUNKS_KEY")
     MUTANTAPE_KEY = os.environ.get("MUTANTAPE_KEY")
     ETHERSCAN_KEY = os.environ.get("ETHERSCAN_KEY")
 
     # Cryptopunks
-
     cryptopunks_url = f'https://api.etherscan.io/api?module=account&action=txlist&address={CRYPTOPUNKS_KEY}&startblock=0&endblock=99999999&sort=asc&apikey={ETHERSCAN_KEY}'
     cryptopunks_response = requests.get(cryptopunks_url)
     cryptopunks_data = cryptopunks_response.json()
+    logging.info("Cryptopunks Data: %s", cryptopunks_data)
+    process_and_store_data(cryptopunks_data, "Cryptopunks")
 
     # MutantApe
- 
     mutantape_url = f'https://api.etherscan.io/api?module=account&action=txlist&address={MUTANTAPE_KEY}&startblock=0&endblock=99999999&sort=asc&apikey={ETHERSCAN_KEY}'
     mutantape_response = requests.get(mutantape_url)
     mutantape_data = mutantape_response.json()
+    logging.info("MutantApe Data: %s", mutantape_data)
+    process_and_store_data(mutantape_data, "MutantApe")
 
-    # You can do something with the fetched data here (e.g., store it, display it, etc.)
-    print("Cryptopunks Data:")
-    print(cryptopunks_data)
-    print("\n")
+    return "Data fetched and processed successfully."
 
-    print("MutantApe Data:")
-    print(mutantape_data)
+   
+   
 
-    return "Data fetched successfully."
+
+
+# ELASTICSEARCH_USERNAME = os.environ.get("ELASTICSEARCH_USERNAME")
+# ELASTICSEARCH_PASSWORD = os.environ.get("ELASTICSEARCH_PASSWORD")
+# ELASTICSEARCH_HOST = os.environ.get("ELASTICSEARCH_HOST")
+
+# es = Elasticsearch(
+#     cloud_id=ELASTICSEARCH_HOST,
+#     http_auth=(ELASTICSEARCH_USERNAME, ELASTICSEARCH_PASSWORD)
+# )
+
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002)
