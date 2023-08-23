@@ -1,27 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <title>Dashboard</title>
 </head>
 <body>
-    <h1>Dashboard</h1>
-    <h2>Welcome {{ name }}</h2>
-    <a href="{{ url_for('logout') }}">Logout</a>
-</body>
-</html>
-"""
-
-
-# Path: templates/base.html
-"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Flask Login</title>
-</head>
-<body>
-    {% block content %}{% endblock %}
+    <div class="landing_container">
+    <h1 class="title">Welcome {{ name }}</h1>
+    <div class="dash_links">
+    
+        <a href="{{ url_for('chart') }}">Find out best time to buy</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    
+</div>
 </body>
 </html>

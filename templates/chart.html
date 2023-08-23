@@ -10,35 +10,34 @@
 <body>
     <div id="chartContainer"></div>
     <script>
-        // Use JavaScript to retrieve and format data from Flask route
-        fetch('/get_chart_data')
-            .then(response => response.json())
-            .then(data => {
-                const categories = data.map(entry => entry.hour);
-                const avgGasFeesUSD = data.map(entry => entry.average_gas_fee_usd);
-                
-                // Create the Highcharts chart
-                Highcharts.chart('chartContainer', {
-                    chart: {
-                        type: 'line'
-                    },
-                    title: {
-                        text: 'Average Gas Fees Chart'
-                    },
-                    xAxis: {
-                        categories: categories
-                    },
-                    yAxis: {
-                        title: {
-                            text: 'Average Gas Fee (USD)'
-                        }
-                    },
-                    series: [{
-                        name: 'Average Gas Fee',
-                        data: avgGasFeesUSD
-                    }]
-                });
-            });
+        // Load the JSON data from the Flask route
+        const chartData = {{ chart_data_json|safe }};
+        
+        // Extract categories and data from the JSON data
+        const categories = chartData.map(entry => entry.hour);
+        const avgGasFeesUSD = chartData.map(entry => entry.average_gas_fee_usd);
+        
+        // Create the Highcharts chart
+        Highcharts.chart('chartContainer', {
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: 'Average Gas Fees Chart'
+            },
+            xAxis: {
+                categories: categories
+            },
+            yAxis: {
+                title: {
+                    text: 'Average Gas Fee (USD)'
+                }
+            },
+            series: [{
+                name: 'Average Gas Fee',
+                data: avgGasFeesUSD
+            }]
+        });
     </script>
 </body>
 </html>

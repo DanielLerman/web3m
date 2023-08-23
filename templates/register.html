@@ -2,10 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <title>Register</title>
 </head>
 <body>
-    <h1>Register</h1>
+  <div class="landing_container">
+    <h1 >Register</h1>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
@@ -13,13 +16,14 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <form action="" method="post">
+    <form class="register_form" action="" method="post">
         <input type="text" name="fname" placeholder="First Name" required>
         <input type="text" name="lname" placeholder="Last Name" required>
         <input type="email" name="email" placeholder="Email" required>
         <input type="password" name="password" placeholder="Password" required>
         <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-        <input type="submit" value="Register">
+        <input id="register_submit" type="submit" value="Submit">
     </form>
+</div>
 </body>
 </html>
