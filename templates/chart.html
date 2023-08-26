@@ -11,13 +11,21 @@
 <body>
     <div id="chartContainer"></div>
     <div class="dash_links">
+        <div id="spinner" class="spinner" style="display: none;"></div>
         {% if project_name == 'Cryptopunks' %}
-        <a href="{{ url_for('chart', project_name='MutantApe') }}">Find out best time to buy MutantApe</a> 
+        <a id="chart-link-cryptopunks" href="{{ url_for('chart', project_name='Cryptopunks') }}" onclick="showSpinner('chart-link-cryptopunks')" >Find out best time to buy MutantApe</a> 
         {% elif project_name == 'MutantApe' %}
-        <a href="{{ url_for('chart', project_name='Cryptopunks') }}">Find out best time to buy Cryptopunks</a>
+        <a id="chart-link-mutantape" href="{{ url_for('chart', project_name='MutantApe') }}" onclick="showSpinner('chart-link-mutantape')">Find out best time to buy Cryptopunks</a>
         {% endif %}
     </div>
     <script>
+           function showSpinner(linkId) {
+        const spinner = document.getElementById('spinner');
+        const link = document.getElementById(linkId);
+
+        spinner.style.display = 'inline-block';
+        link.style.display = 'none';
+    }
         // Load the JSON data from the Flask route
         const chartData = {{ chart_data_json|safe }};
         

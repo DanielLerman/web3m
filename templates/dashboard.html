@@ -7,25 +7,25 @@
 </head>
 <body>
     <div class="landing_container">
-    <h1 class="title">Welcome {{ name }}</h1>
-    <div class="dash_links">
-        
-    
-        <a href="{{ url_for('chart', project_name='Cryptopunks') }}">Find out best time to buy Cryptopunks</a>
-        <a href="{{ url_for('chart', project_name='MutantApe') }}">Find out best time to buy MutantApe</a>   
-        <a href="{{ url_for('logout') }}">Logout</a>
+        <h1 class="title">Welcome {{ name }}</h1>
+        <div class="dash_links">
+            <div id="spinner" class="spinner" style="display: none;"></div>
+            <a id="chart-link-cryptopunks" href="{{ url_for('chart', project_name='Cryptopunks') }}" onclick="showSpinner()">Find out best time to buy Cryptopunks</a>
+            <a id="chart-link-mutantape" href="{{ url_for('chart', project_name='MutantApe') }}" onclick="showSpinner()">Find out best time to buy MutantApe</a>
+            <a id="logout-btn " href="{{ url_for('logout') }}">Logout</a>
+        </div>
     </div>
-    <script>
-        // Function to handle link click
-        function handleLinkClick() {
-            document.getElementById('chart_link').style.display = 'none';
-            document.getElementById('loading_icon').style.display = 'block';
-        }
 
-        // Attach the function to the link's click event
-        document.getElementById('chart-link').addEventListener('click', handleLinkClick);
+    <script>
+       function showSpinner() {
+        const spinner = document.getElementById('spinner');
+        const cryptopunksLink = document.getElementById('chart-link-cryptopunks');
+        const mutantapeLink = document.getElementById('chart-link-mutantape');
+
+        cryptopunksLink.style.display = 'none';
+        mutantapeLink.style.display = 'none';
+        spinner.style.display = 'inline-block';
+    }
     </script>
-    
-</div>
 </body>
 </html>
