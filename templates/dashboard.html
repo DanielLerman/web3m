@@ -9,10 +9,22 @@
     <div class="landing_container">
     <h1 class="title">Welcome {{ name }}</h1>
     <div class="dash_links">
+        
     
-        <a href="{{ url_for('chart') }}">Find out best time to buy</a>
+        <a href="{{ url_for('chart', project_name='Cryptopunks') }}">Find out best time to buy Cryptopunks</a>
+        <a href="{{ url_for('chart', project_name='MutantApe') }}">Find out best time to buy MutantApe</a>   
         <a href="{{ url_for('logout') }}">Logout</a>
     </div>
+    <script>
+        // Function to handle link click
+        function handleLinkClick() {
+            document.getElementById('chart_link').style.display = 'none';
+            document.getElementById('loading_icon').style.display = 'block';
+        }
+
+        // Attach the function to the link's click event
+        document.getElementById('chart-link').addEventListener('click', handleLinkClick);
+    </script>
     
 </div>
 </body>

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -9,11 +9,8 @@ import requests
 import json
 import logging
 from elasticsearch.helpers import scan
-from highcharts_core.chart import Chart
-from dotenv import load_dotenv 
-
+from dotenv import load_dotenv
 load_dotenv()
-
 
 # logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -134,11 +131,9 @@ def get_eth_to_usd_exchange_rate():
 
 @app.route('/fetch_data')
 def fetch_data():
-             
         CRYPTOPUNKS_KEY = os.environ.get("CRYPTOPUNKS_KEY")
         MUTANTAPE_KEY = os.environ.get("MUTANTAPE_KEY")
         ETHERSCAN_KEY = os.environ.get("ETHERSCAN_KEY")
-     
 
         # Cryptopunks
         cryptopunks_url = f'https://api.etherscan.io/api?module=account&action=txlist&address={CRYPTOPUNKS_KEY}&startblock=0&endblock=99999999&sort=asc&apikey={ETHERSCAN_KEY}'
@@ -224,45 +219,44 @@ def process_and_store_data(data, project_name):
     except Exception as process_error:
         print("Error processing data:", process_error)
 
-
-
-
+# ... (other imports and configurations)
 
 @app.route('/chart')
 def chart():
-    try:
-        fetch_data()
-        # Define your Elasticsearch query here
-        es_query = {
-            "query": {
-                "match": {
-                    "project_name": "Cryptopunks"  
-                }
-            },
-            "size": 1000  
+    project_name = request.args.get('project_name', None)
+    if project_name is None:
+        return "Please provide a project name."
+
+    # Fetch and process the data from external sources, and index it into Elasticsearch
+    fetch_data()
+
+    # Get the average gas fees per hour for the given project from Elasticsearch
+    index_name = "gas-fees-index"
+    query = {
+        "query": {
+            "match": {
+                "project_name": project_name
+            }
         }
+    }
+    response = client.search(index=index_name, body=query)
+    logging.info("Elasticsearch response: %s", response)
 
-        # Execute the query and retrieve data
-        results = client.search(index="gas-fees-index", body=es_query)["hits"]["hits"]
-        
-        # Format the data for Highcharts
-        chart_data = [{"hour": hit["_source"]["hour"], "average_gas_fee_usd": hit["_source"]["average_gas_fee_usd"]} for hit in results]
+    # Prepare the chart data
+    chart_data = []
+    for hit in response['hits']['hits']:
+        source = hit['_source']
+        hour = source['hour']
+        avg_fee_usd = source['average_gas_fee_usd']
+        chart_data.append({"hour": hour, "average_gas_fee_usd": avg_fee_usd})
 
-        # Convert the data to a JSON string for JavaScript consumption
-        chart_data_json = json.dumps(chart_data)
+    return render_template('chart.html', chart_data_json=json.dumps(chart_data))
+    
 
-        return render_template('chart.html', chart_data_json=chart_data_json)
-    except Exception as e:
-        return "Error fetching or formatting data: " + str(e)
+
+
 
 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5003)
-
-   
-
-
-
-
-
