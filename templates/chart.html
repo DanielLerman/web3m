@@ -3,12 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <title>Gas Fee Chart</title>
     <!-- Include Highcharts library script -->
     <script src="https://code.highcharts.com/highcharts.js"></script>
 </head>
 <body>
     <div id="chartContainer"></div>
+    <div class="dash_links">
+        {% if project_name == 'Cryptopunks' %}
+        <a href="{{ url_for('chart', project_name='MutantApe') }}">Find out best time to buy MutantApe</a> 
+        {% elif project_name == 'MutantApe' %}
+        <a href="{{ url_for('chart', project_name='Cryptopunks') }}">Find out best time to buy Cryptopunks</a>
+        {% endif %}
+    </div>
     <script>
         // Load the JSON data from the Flask route
         const chartData = {{ chart_data_json|safe }};

@@ -221,6 +221,8 @@ def process_and_store_data(data, project_name):
 
 # ... (other imports and configurations)
 
+# ... (other imports and configurations)
+
 @app.route('/chart')
 def chart():
     project_name = request.args.get('project_name', None)
@@ -250,8 +252,9 @@ def chart():
         avg_fee_usd = source['average_gas_fee_usd']
         chart_data.append({"hour": hour, "average_gas_fee_usd": avg_fee_usd})
 
-    return render_template('chart.html', chart_data_json=json.dumps(chart_data))
-    
+    return render_template('chart.html', chart_data_json=json.dumps(chart_data), project_name=project_name)
+
+
 
 
 
