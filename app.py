@@ -12,7 +12,6 @@ from elasticsearch.helpers import scan
 from dotenv import load_dotenv
 load_dotenv()
 
-# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
@@ -129,7 +128,6 @@ def get_eth_to_usd_exchange_rate():
 
            
 
-@app.route('/fetch_data')
 def fetch_data():
         CRYPTOPUNKS_KEY = os.environ.get("CRYPTOPUNKS_KEY")
         MUTANTAPE_KEY = os.environ.get("MUTANTAPE_KEY")
@@ -139,14 +137,12 @@ def fetch_data():
         cryptopunks_url = f'https://api.etherscan.io/api?module=account&action=txlist&address={CRYPTOPUNKS_KEY}&startblock=0&endblock=99999999&sort=asc&apikey={ETHERSCAN_KEY}'
         cryptopunks_response = requests.get(cryptopunks_url)
         cryptopunks_data = json.loads(cryptopunks_response.text)
-        # logging.info("Cryptopunks Data: %s", cryptopunks_data)
         process_and_store_data(cryptopunks_data, "Cryptopunks")
 
         # MutantApe
         mutantape_url = f'https://api.etherscan.io/api?module=account&action=txlist&address={MUTANTAPE_KEY}&startblock=0&endblock=99999999&sort=asc&apikey={ETHERSCAN_KEY}'
         mutantape_response = requests.get(mutantape_url)
         mutantape_data = json.loads(mutantape_response.text)
-        # logging.info("MutantApe Data: %s", mutantape_data)
         process_and_store_data(mutantape_data, "MutantApe")
 
         return "Data fetched and processed successfully."
@@ -219,9 +215,6 @@ def process_and_store_data(data, project_name):
     except Exception as process_error:
         print("Error processing data:", process_error)
 
-# ... (other imports and configurations)
-
-# ... (other imports and configurations)
 
 @app.route('/chart')
 def chart():
@@ -251,13 +244,10 @@ def chart():
         hour = source['hour']
         avg_fee_usd = source['average_gas_fee_usd']
         chart_data.append({"hour": hour, "average_gas_fee_usd": avg_fee_usd})
+    
+  
 
     return render_template('chart.html', chart_data_json=json.dumps(chart_data), project_name=project_name)
-
-
-
-
-
 
 
 

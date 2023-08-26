@@ -26,8 +26,9 @@
         spinner.style.display = 'inline-block';
         link.style.display = 'none';
     }
-        // Load the JSON data from the Flask route
-        const chartData = {{ chart_data_json|safe }};
+    
+    const chartData = JSON.parse('{{ chart_data_json|safe }}');
+
         
         // Extract categories and data from the JSON data
         const categories = chartData.map(entry => entry.hour);
